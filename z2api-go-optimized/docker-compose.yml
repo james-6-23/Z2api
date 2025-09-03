@@ -1,0 +1,67 @@
+# Z2API Go优化版 - 独立部署配置
+version: '3.8'
+
+services:
+  z2api-go:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: z2api-go
+    ports:
+      - "8080:8080"
+    environment:
+      # 基础配置
+      - PORT=8080
+      - DEFAULT_KEY=${DEFAULT_KEY:-123456}
+      - UPSTREAM_URL=${UPSTREAM_URL:-https://chat.z.ai/api/chat/completions}
+      - UPSTREAM_TOKEN=${UPSTREAM_TOKEN:-}
+      
+      # 性能配置
+      - PERFORMANCE_MODE=${PERFORMANCE_MODE:-balanced}
+      - MAX_RETRIES=${MAX_RETRIES:-3}
+      - RETRY_DELAY=${RETRY_DELAY:-1000}
+      - REQUEST_TIMEOUT=${REQUEST_TIMEOUT:-120000}
+      - STREAM_TIMEOUT=${STREAM_TIMEOUT:-300000}
+      - RANDOM_DELAY_MIN=${RANDOM_DELAY_MIN:-100}
+      - RANDOM_DELAY_MAX=${RANDOM_DELAY_MAX:-500}
+      
+      # 并发控制配置
+      - MAX_CONCURRENT_CONNECTIONS=${MAX_CONCURRENT_CONNECTIONS:-1000}
+      - CONNECTION_QUEUE_SIZE=${CONNECTION_QUEUE_SIZE:-500}
+      - MAX_CONNECTION_TIME=${MAX_CONNECTION_TIME:-600000}
+      - MEMORY_LIMIT_MB=${MEMORY_LIMIT_MB:-2048}
+      
+      # 流处理优化配置
+      - STREAM_BUFFER_SIZE=${STREAM_BUFFER_SIZE:-16384}
+      - DISABLE_CONNECTION_CHECK=${DISABLE_CONNECTION_CHECK:-false}
+      - CONNECTION_CHECK_INTERVAL=${CONNECTION_CHECK_INTERVAL:-20}
+      
+      # 功能配置
+      - ANON_TOKEN_ENABLED=${ANON_TOKEN_ENABLED:-true}
+      - THINK_TAGS_MODE=${THINK_TAGS_MODE:-think}
+      - DEBUG_MODE=${DEBUG_MODE:-false}
+      - ENABLE_METRICS=${ENABLE_METRICS:-true}
+      
+      # 日志配置
+      - ENABLE_DETAILED_LOGGING=${ENABLE_DETAILED_LOGGING:-true}
+      - LOG_USER_MESSAGES=${LOG_USER_MESSAGES:-false}
+      - LOG_RESPONSE_CONTENT=${LOG_RESPONSE_CONTENT:-false}
+    
+    restart: unless-stopped
+    
+    healthcheck:
+      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:8080/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    
+    # 资源限制
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '2.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
