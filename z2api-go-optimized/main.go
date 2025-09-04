@@ -185,6 +185,7 @@ type HealthResponse struct {
 	BuildDate       string       `json:"build_date"`
 	Description     string       `json:"description"`
 	PerformanceMode string       `json:"performance_mode"`
+	UptimeSeconds   int          `json:"uptime_seconds"`
 	Config          HealthConfig `json:"config"`
 	Stats           HealthStats  `json:"stats"`
 	Improvements    []string     `json:"improvements"`
@@ -610,6 +611,7 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 		BuildDate:       BUILD_DATE,
 		Description:     DESCRIPTION,
 		PerformanceMode: performanceMode,
+		UptimeSeconds:   int(uptime.Seconds()),
 		Config: HealthConfig{
 			MaxRetries:             maxRetries,
 			RetryDelay:             retryDelay,
