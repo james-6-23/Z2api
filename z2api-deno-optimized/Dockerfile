@@ -19,9 +19,7 @@ ENV DEBUG_MODE=false
 # 缓存依赖（提高构建速度）
 RUN deno cache app.ts
 
-# 创建非root用户
-RUN addgroup --system --gid 1001 deno
-RUN adduser --system --uid 1001 deno
+# 使用已存在的deno用户（Deno官方镜像已包含）
 USER deno
 
 # 暴露端口
