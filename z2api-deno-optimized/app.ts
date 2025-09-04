@@ -366,8 +366,8 @@ async function getAnonymousToken(): Promise<string> {
 
 // 思考内容转换函数
 function transformThinking(s: string): string {
-  // 去 <summary>…</summary>
-  s = s.replace(/(?s)<summary>.*?<\/summary>/g, "");
+  // 去 <summary>…</summary> (使用 s 标志支持跨行匹配)
+  s = s.replace(/<summary>.*?<\/summary>/gs, "");
   // 清理残留自定义标签，如 </thinking>、<Full> 等
   s = s.replace(/<\/thinking>/g, "");
   s = s.replace(/<Full>/g, "");
